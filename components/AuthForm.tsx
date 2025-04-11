@@ -13,6 +13,7 @@ import FormField from "@/components/FormField";
 import { useRouter } from "next/navigation";
 import { auth } from "@/firebase/client";
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import { signUp } from "@/lib/actions/auth.action";
 
 const authFormSchema = (type: FormType) => {
   return z.object({
@@ -47,6 +48,18 @@ const AuthForm = ({ type }: { type: FormType }) => {
           email,
           password
         );
+
+        const result = await signUp({
+          name: name!,
+          email,
+          password,
+          uid: userCredentials.user.uid,
+        });
+
+        if (!result.success) {
+          toast.error(result.message);
+          return;
+        }
 
         toast.success("Account created successfully. Please sign in.");
         router.push("/sign-in");
