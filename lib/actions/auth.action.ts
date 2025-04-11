@@ -1,6 +1,9 @@
 "use server";
 
-import { db } from "@/firebase/client";
+import { db, auth } from "@/firebase/admin";
+import { cookies } from "next/headers";
+
+const ONE_WEEK = 60 * 60 * 24 * 7 * 1000; // 7 days
 
 export async function signUp(params: SignUpParams) {
   const { uid, name, email } = params;
@@ -32,4 +35,14 @@ export async function signUp(params: SignUpParams) {
     success: false,
     message: "Failed to create an account.",
   };
+}
+
+export async function setSessionCookie(idToken: string) {
+  const cookieStore = await cookies();
+
+  const sessionCookie = await auth().createSessionCookie(idToken, {
+    expiresIn: 60 * 60 * 24 * 7 * 1000, // 7 days
+  });
+
+  cookieStore.set("session", sessionCookie, {});
 }
