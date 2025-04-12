@@ -41,8 +41,14 @@ export async function setSessionCookie(idToken: string) {
   const cookieStore = await cookies();
 
   const sessionCookie = await auth().createSessionCookie(idToken, {
-    expiresIn: 60 * 60 * 24 * 7 * 1000, // 7 days
+    expiresIn: ONE_WEEK * 1000, // 7 days
   });
 
-  cookieStore.set("session", sessionCookie, {});
+  cookieStore.set("session", sessionCookie, {
+    maxAge: ONE_WEEK,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    sameSite: "lax",
+  });
 }
