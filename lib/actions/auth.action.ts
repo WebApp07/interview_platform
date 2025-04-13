@@ -37,6 +37,28 @@ export async function signUp(params: SignUpParams) {
   };
 }
 
+export async function signIn(params: SignInParams) {
+  const { email, idToken } = params;
+
+  try {
+    const userRecored = await auth.getUserByEmail(email);
+    if (!userRecored) {
+      return {
+        success: false,
+        message: "User does not exist. Please Create an account instead.",
+      };
+    }
+
+    await setSessionCookie(idToken);
+  } catch (e) {
+    console.error("Error signing in", e);
+    return {
+      success: false,
+      message: "Failed to log into an account.",
+    };
+  }
+}
+
 export async function setSessionCookie(idToken: string) {
   const cookieStore = await cookies();
 
